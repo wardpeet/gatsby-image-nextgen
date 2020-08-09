@@ -1,0 +1,19 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "target": "es5",
+    "outDir": "./dist",
+    "declarationDir": "./dist",
+    "lib": ["es2016", "dom"],
+    "jsxFactory": "createElement"
+  },
+  "include": ["./src/index.tsx", "./src/index.browser.tsx"]
+}

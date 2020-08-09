@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "workspaces": [
+    "gatsby-image"
+  ],
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.0.4",
+    "@types/jest": "^26.0.14",
+    "@types/testing-library__jest-dom": "^5.9.2",
+    "husky": "^4.3.0",
+    "jest": "^26.4.2",
+    "lint-staged": "^10.4.0",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.0",
+    "typescript": "^4.0.3"
+  },
+  "lint-staged": {
+    "*.{js,md,mdx,json}": [
+      "prettier --write"
+    ]
+  },
+  "hooks": {
+    "pre-commit": "lint-staged"
+  }
+}
