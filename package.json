@@ -1,0 +1,61 @@
+{
+  "name": "@wardpeet/gatsby-image",
+  "version": "0.0.0",
+  "description": "Lazy-loading React image component with optional support for the blur-up effect.",
+  "main": "dist/gatsby-image.js",
+  "module": "dist/gatsby-image.module.js",
+  "esmodule": "dist/gatsby-image.modern.js",
+  "browser": {
+    "./dist/gatsby-image.js": "./dist/gatsby-image.browser.js",
+    "./dist/gatsby-image.module.js": "./dist/gatsby-image.browser.module.js",
+    "./dist/gatsby-image.modern.js": "./dist/gatsby-image.browser.modern.js"
+  },
+  "types": "dist/gatsby-image.d.ts",
+  "repository": "git@github.com:wardpeet/gatsby-image-nextgen.git",
+  "author": "Ward Peeters <ward@coding-tech.com>",
+  "license": "MIT",
+  "dependencies": {
+    "prop-types": "^15.7.2"
+  },
+  "peerDependencies": {
+    "react": ">16.13.1",
+    "react-dom": ">16.13.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.0.4",
+    "@types/jest": "^26.0.14",
+    "@types/prop-types": "^15.7.3",
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8",
+    "@types/testing-library__jest-dom": "^5.9.2",
+    "del-cli": "^3.0.1",
+    "husky": "^4.3.0",
+    "jest": "^26.4.2",
+    "lint-staged": "^10.4.0",
+    "microbundle": "^0.12.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.0",
+    "typescript": "^4.0.3"
+  },
+  "scripts": {
+    "build": "npm-run-all -s clean build::server build:browser",
+    "build:server": "microbundle -f cjs,modern,es --jsx createElement",
+    "build:browser": "microbundle -i src/index.browser.tsx -f cjs,modern,es --jsx createElement -o dist/gatsby-image.browser --define=@process.env.NODE_ENV=\"JSON.stringify('production')\"",
+    "watch": "run-p watch:node watch:browser",
+    "watch:node": "yarn build:node watch",
+    "watch:browser": "yarn build:browser watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "clean": "del-cli dist/*"
+  },
+  "lint-staged": {
+    "*.{js,md,mdx,json}": [
+      "prettier --write"
+    ]
+  },
+  "hooks": {
+    "pre-commit": "lint-staged"
+  }
+}
