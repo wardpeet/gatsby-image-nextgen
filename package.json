@@ -2,14 +2,24 @@
   "name": "@wardpeet/gatsby-image",
   "version": "0.0.0",
   "description": "Lazy-loading React image component with optional support for the blur-up effect.",
+  "sideEffects": false,
   "main": "dist/gatsby-image.js",
   "module": "dist/gatsby-image.module.js",
   "esmodule": "dist/gatsby-image.modern.js",
   "browser": {
+    "./compat.js": "./compat.browser.module.js",
+    "./compat.module.js": "./compat.browser.module.js",
+    "./compat.modern.js": "./compat.browser.modern.js",
     "./dist/gatsby-image.js": "./dist/gatsby-image.browser.js",
     "./dist/gatsby-image.module.js": "./dist/gatsby-image.browser.module.js",
     "./dist/gatsby-image.modern.js": "./dist/gatsby-image.browser.modern.js"
   },
+  "files": [
+    "dist/*",
+    "compat.js",
+    "compat.module.js",
+    "compat.modern.js"
+  ],
   "types": "dist/gatsby-image.d.ts",
   "repository": "git@github.com:wardpeet/gatsby-image-nextgen.git",
   "author": "Ward Peeters <ward@coding-tech.com>",
@@ -40,12 +50,16 @@
     "typescript": "^4.0.3"
   },
   "scripts": {
-    "build": "npm-run-all -s clean build::server build:browser",
-    "build:server": "microbundle -f cjs,modern,es --jsx createElement",
-    "build:browser": "microbundle -i src/index.browser.tsx -f cjs,modern,es --jsx createElement -o dist/gatsby-image.browser --define=@process.env.NODE_ENV=\"JSON.stringify('production')\"",
-    "watch": "run-p watch:node watch:browser",
-    "watch:node": "yarn build:node watch",
-    "watch:browser": "yarn build:browser watch",
+    "build": "npm-run-all -s clean build:server build:browser build:server-compat build:browser-compat",
+    "build:server": "microbundle -f cjs,es --jsx createElement",
+    "build:browser": "microbundle -i src/index.browser.tsx -f cjs,modern,es --jsx createElement -o dist/gatsby-image.browser",
+    "build:server-compat": "microbundle -i src/compat.tsx -f cjs,es --jsx createElement -o dist/gatsby-image.compat",
+    "build:browser-compat": "microbundle -i src/compat.browser.tsx -f cjs,modern,es --jsx createElement -o dist/gatsby-image.compat.browser",
+    "watch": "run-p watch:server watch:browser watch:server-compat watch:browser-compat",
+    "watch:server": "yarn build:server --no-compress watch",
+    "watch:browser": "yarn build:browser --no-compress watch",
+    "watch:server-compat": "yarn build:server-compat --no-compress watch",
+    "watch:browser-compat": "yarn build:browser-compat --no-compress watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "clean": "del-cli dist/*"
