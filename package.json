@@ -1,7 +1,8 @@
 {
   "private": true,
   "workspaces": [
-    "gatsby-image"
+    "gatsby-image",
+    "using-gatsby-image-nextgen"
   ],
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",
