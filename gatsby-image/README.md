@@ -74,7 +74,7 @@ Then in your `gatsby-config.js`:
 plugins: [
   `gatsby-transformer-sharp`,
   `gatsby-plugin-sharp`,
-  `@wardpeet/gatsby-image-nexgen`,
+  `@wardpeet/gatsby-image-nextgen`,
 ];
 ```
 
@@ -94,7 +94,7 @@ module.exports = {
     },
     `gatsby-plugin-sharp`,
     `gatsby-transformer-sharp`,
-    `@wardpeet/gatsby-image-nexgen`,
+    `@wardpeet/gatsby-image-nextgen`,
   ],
 };
 ```
@@ -107,7 +107,7 @@ This is what a component using `@wardpeet/gatsby-image` looks like:
 // TODO We don't have proper Fragments yet so this isn't user friendly yet
 import * as React from 'react';
 import { graphql } from 'gatsby';
-import { GatsbyImage } from '@wardpeet/gatsby-image-nexgen';
+import { GatsbyImage } from '@wardpeet/gatsby-image-nextgen';
 
 export default ({ data }) => (
   <div>
