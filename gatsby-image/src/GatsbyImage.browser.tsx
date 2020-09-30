@@ -57,7 +57,6 @@ export const GatsbyImageHydrator: FunctionComponent<GatsbyImageProps> = function
   const [isLoading, toggleIsLoading] = useState(hasNativeLazyLoadSupport);
   const [isLoaded, toggleIsLoaded] = useState(false);
 
-  // @ts-ignore
   if (!global.GATSBY___IMAGE && !showedWarning) {
     showedWarning = true;
     console.warn(
@@ -72,78 +71,93 @@ export const GatsbyImageHydrator: FunctionComponent<GatsbyImageProps> = function
   );
 
   useEffect(() => {
-    const doRender = hydrated.current ? render : hydrate;
-
     if (root.current) {
       const hasSSRHtml = root.current.querySelector('[data-gatsby-image-ssr]');
+
       // when SSR and native lazyload is supported we'll do nothing ;)
-      // @ts-ignore
       if (hasNativeLazyLoadSupport && hasSSRHtml && global.GATSBY___IMAGE) {
         hasSSRHtml.addEventListener('load', function onLoad() {
           hasSSRHtml.removeEventListener('load', onLoad);
 
           storeImageloaded(JSON.stringify(images));
         });
-        return;
       }
-
-      const cacheKey = JSON.stringify(images);
-      const hasLoaded = !hydrated.current && hasImageLoaded(cacheKey);
-
-      const component = (
-        <LayoutWrapper layout={layout} width={width} height={height}>
-          {!hasLoaded && <Placeholder {...getPlaceHolderProps(placeholder)} />}
-          <MainImage
-            {...(props as Omit<MainImageProps, 'images' | 'fallback'>)}
-            {...getMainProps(
-              isLoading,
-              hasLoaded || isLoaded,
-              images,
-              loading,
-              () => {
-                toggleIsLoaded(true);
-              },
-              cacheKey,
-              ref
-            )}
-          />
-        </LayoutWrapper>
-      );
-
-      doRender(component, root.current);
-      hydrated.current = true;
-
-      if (!(`IntersectionObserver` in window)) {
-        toggleIsLoading(true);
-        return;
-      }
-
-      io.current = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              toggleIsLoading(true);
-            }
-          });
-        },
-        {
-          // TODO tweak
-          rootMargin: '150%',
-        }
-      );
-      io.current.observe(root.current);
     }
+  }, []);
 
-    return () => {
-      if (root.current) {
-        if (io.current) {
-          io.current.unobserve(root.current);
-        }
+  // useEffect(() => {
+  //   const doRender = hydrated.current ? render : hydrate;
 
-        render(null, root.current);
-      }
-    };
-  }, [isLoading, isLoaded]);
+  //   if (root.current) {
+  //     const hasSSRHtml = root.current.querySelector('[data-gatsby-image-ssr]');
+  //     // when SSR and native lazyload is supported we'll do nothing ;)
+  //     if (hasNativeLazyLoadSupport && hasSSRHtml && global.GATSBY___IMAGE) {
+  //       hasSSRHtml.addEventListener('load', function onLoad() {
+  //         hasSSRHtml.removeEventListener('load', onLoad);
+
+  //         storeImageloaded(JSON.stringify(images));
+  //       });
+
+  //       return;
+  //     }
+
+  //     const cacheKey = JSON.stringify(images);
+  //     const hasLoaded = !hydrated.current && hasImageLoaded(cacheKey);
+
+  //     const component = (
+  //       <LayoutWrapper layout={layout} width={width} height={height}>
+  //         {!hasLoaded && <Placeholder {...getPlaceHolderProps(placeholder)} />}
+  //         <MainImage
+  //           {...(props as Omit<MainImageProps, 'images' | 'fallback'>)}
+  //           {...getMainProps(
+  //             isLoading,
+  //             hasLoaded || isLoaded,
+  //             images,
+  //             loading,
+  //             () => {
+  //               toggleIsLoaded(true);
+  //             },
+  //             cacheKey,
+  //             ref
+  //           )}
+  //         />
+  //       </LayoutWrapper>
+  //     );
+
+  //     doRender(component, root.current);
+  //     hydrated.current = true;
+
+  //     if (!(`IntersectionObserver` in window)) {
+  //       toggleIsLoading(true);
+  //       return;
+  //     }
+
+  //     io.current = new IntersectionObserver(
+  //       (entries) => {
+  //         entries.forEach((entry) => {
+  //           if (entry.isIntersecting) {
+  //             toggleIsLoading(true);
+  //           }
+  //         });
+  //       },
+  //       {
+  //         // TODO tweak
+  //         rootMargin: '150%',
+  //       }
+  //     );
+  //     io.current.observe(root.current);
+  //   }
+
+  //   return () => {
+  //     if (root.current) {
+  //       if (io.current) {
+  //         io.current.unobserve(root.current);
+  //       }
+
+  //       render(null, root.current);
+  //     }
+  //   };
+  // }, [isLoading, isLoaded]);
 
   return (
     <Type

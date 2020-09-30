@@ -1,4 +1,7 @@
+/* global SERVER */
 import { createElement, Fragment, FunctionComponent, ReactNode } from 'react';
+
+const terserMacro = require('../macros/terser.macro');
 
 export type LayoutWrapperProps = {
   layout: 'intrinsic' | 'responsive' | 'fixed';
@@ -10,7 +13,7 @@ const NativeScriptLoading = () => (
   <script
     type="module"
     dangerouslySetInnerHTML={{
-      __html: `
+      __html: terserMacro`
 const hasNativeLazyLoadSupport = typeof HTMLImageElement !== "undefined" && "loading" in HTMLImageElement.prototype;
 if (hasNativeLazyLoadSupport) {
   const gatsbyImages = document.querySelectorAll('img[data-main-image]');
@@ -65,7 +68,7 @@ export const LayoutWrapper: FunctionComponent<LayoutWrapperProps> = function Lay
     <Fragment>
       {sizer}
       {children}
-      <NativeScriptLoading />
+      {SERVER && <NativeScriptLoading />}
     </Fragment>
   );
 };

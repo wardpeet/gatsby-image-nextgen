@@ -1,4 +1,4 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["./src/index.tsx", "./src/index.browser.tsx"]
+  "include": ["./global.d.ts", "./src/index.tsx", "./src/index.browser.tsx"]
 }
