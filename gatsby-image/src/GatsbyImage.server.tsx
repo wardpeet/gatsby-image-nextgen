@@ -3,13 +3,14 @@ import {
   ElementType,
   FunctionComponent,
   CSSProperties,
-  ImgHTMLAttributes,
 } from 'react';
 import { GatsbyImageProps } from './GatsbyImage.browser';
 import { getWrapperProps, getMainProps, getPlaceHolderProps } from './hooks';
 import { Placeholder } from './Placeholder';
 import { MainImage, MainImageProps } from './MainImage';
 import { LayoutWrapper } from './LayoutWrapper';
+
+const removeNewLines = (str: string): string => str.replace(/\n/g, '');
 
 export const GatsbyImageHydrator: FunctionComponent<{
   as?: ElementType;
@@ -37,6 +38,28 @@ export const GatsbyImage: FunctionComponent<GatsbyImageProps> = function GatsbyI
     layout
   );
 
+  const cleanedImages: GatsbyImageProps['images'] = {
+    fallback: null,
+    sources: [],
+  };
+  if (images.fallback) {
+    cleanedImages.fallback = {
+      src: images.fallback.src,
+      srcSet: images.fallback.srcSet
+        ? removeNewLines(images.fallback.srcSet)
+        : null,
+    };
+  }
+
+  if (images.sources) {
+    cleanedImages.sources = images.sources.map((source) => {
+      return {
+        ...source,
+        srcSet: removeNewLines(source.srcSet),
+      };
+    });
+  }
+
   return (
     <GatsbyImageHydrator
       {...wrapperProps}
@@ -48,12 +71,12 @@ export const GatsbyImage: FunctionComponent<GatsbyImageProps> = function GatsbyI
       className={`${wClass}${className ? ` ${className}` : ''}`}
     >
       <LayoutWrapper layout={layout} width={width} height={height}>
-        <Placeholder {...getPlaceHolderProps(placeholder)} />
+        {placeholder && <Placeholder {...getPlaceHolderProps(placeholder)} />}
         <MainImage
           data-gatsby-image-ssr=""
           {...(props as Omit<MainImageProps, 'images' | 'fallback'>)}
           // When eager is set we want to start the isLoading state on true (we want to load the img without react)
-          {...getMainProps(loading === 'eager', false, images, loading)}
+          {...getMainProps(loading === 'eager', false, cleanedImages, loading)}
         />
       </LayoutWrapper>
     </GatsbyImageHydrator>

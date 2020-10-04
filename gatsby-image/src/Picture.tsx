@@ -52,6 +52,7 @@ const Image: FunctionComponent<ImageProps> = function Image({
   return (
     <img
       {...props}
+      decoding="async"
       loading={loading}
       src={shouldLoad ? src : null}
       data-src={!shouldLoad ? src : null}

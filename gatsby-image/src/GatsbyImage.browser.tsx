@@ -1,26 +1,20 @@
 import {
   createElement,
   ElementType,
-  Fragment,
   useEffect,
   useRef,
   FunctionComponent,
-  CSSProperties,
   ImgHTMLAttributes,
   useState,
 } from 'react';
-import { hydrate, render, Renderer } from 'react-dom';
 import {
   getWrapperProps,
-  getMainProps,
-  getPlaceHolderProps,
   hasNativeLazyLoadSupport,
-  hasImageLoaded,
   storeImageloaded,
 } from './hooks';
-import { LayoutWrapper, LayoutWrapperProps } from './LayoutWrapper';
-import { PlaceholderProps, Placeholder } from './Placeholder';
-import { MainImageProps, MainImage } from './MainImage';
+import { LayoutWrapperProps } from './LayoutWrapper';
+import { PlaceholderProps } from './Placeholder';
+import { MainImageProps } from './MainImage';
 
 export type GatsbyImageProps = Omit<
   ImgHTMLAttributes<HTMLImageElement>,
@@ -34,6 +28,9 @@ export type GatsbyImageProps = Omit<
   images: Pick<MainImageProps, 'sources' | 'fallback'>;
   placeholder: Pick<PlaceholderProps, 'sources' | 'fallback'>;
   width?: number;
+  onLoad?: Function;
+  onError?: Function;
+  onStartLoad?: Function;
 };
 
 let showedWarning = false;
@@ -45,14 +42,15 @@ export const GatsbyImageHydrator: FunctionComponent<GatsbyImageProps> = function
   layout = 'fixed',
   width,
   height,
-  placeholder,
   images,
-  loading,
+  onStartLoad,
+  onLoad: customOnLoad,
   ...props
 }) {
   const root = useRef<HTMLElement>();
   const hydrated = useRef(false);
-  const io = useRef(null);
+  const unobserveRef = useRef(null);
+  const lazyHydrator = useRef(null);
   const ref = useRef();
   const [isLoading, toggleIsLoading] = useState(hasNativeLazyLoadSupport);
   const [isLoaded, toggleIsLoaded] = useState(false);
@@ -76,88 +74,90 @@ export const GatsbyImageHydrator: FunctionComponent<GatsbyImageProps> = function
 
       // when SSR and native lazyload is supported we'll do nothing ;)
       if (hasNativeLazyLoadSupport && hasSSRHtml && global.GATSBY___IMAGE) {
-        hasSSRHtml.addEventListener('load', function onLoad() {
+        onStartLoad && onStartLoad({ wasCached: false });
+
+        if ((hasSSRHtml as HTMLImageElement).complete) {
+          customOnLoad && (customOnLoad as Function)();
+          storeImageloaded(JSON.stringify(images));
+        }
+        hasSSRHtml.addEventListener('load', function onLoad(e) {
           hasSSRHtml.removeEventListener('load', onLoad);
 
+          customOnLoad && (customOnLoad as Function)();
           storeImageloaded(JSON.stringify(images));
         });
+        return;
       }
+
+      // Fallback to custom lazy loading (intersection observer)
+      import('./intersectionObserver').then(
+        ({ createIntersectionObserver }) => {
+          let intersectionObserver = createIntersectionObserver(() => {
+            if (root.current) {
+              onStartLoad && onStartLoad({ wasCached: false });
+              toggleIsLoading(true);
+            }
+          });
+
+          if (root.current) {
+            unobserveRef.current = intersectionObserver(root);
+          }
+        }
+      );
     }
+
+    return () => {
+      if (unobserveRef.current) {
+        unobserveRef.current(root);
+
+        // on unmount, make sure we cleanup
+        if (hydrated.current && lazyHydrator.current) {
+          lazyHydrator.current();
+        }
+      }
+    };
   }, []);
 
-  // useEffect(() => {
-  //   const doRender = hydrated.current ? render : hydrate;
+  useEffect(() => {
+    if (root.current) {
+      const hasSSRHtml = root.current.querySelector('[data-gatsby-image-ssr]');
+      // On first server hydration do nothing
+      if (hasNativeLazyLoadSupport && hasSSRHtml && !hydrated.current) {
+        return;
+      }
 
-  //   if (root.current) {
-  //     const hasSSRHtml = root.current.querySelector('[data-gatsby-image-ssr]');
-  //     // when SSR and native lazyload is supported we'll do nothing ;)
-  //     if (hasNativeLazyLoadSupport && hasSSRHtml && global.GATSBY___IMAGE) {
-  //       hasSSRHtml.addEventListener('load', function onLoad() {
-  //         hasSSRHtml.removeEventListener('load', onLoad);
-
-  //         storeImageloaded(JSON.stringify(images));
-  //       });
-
-  //       return;
-  //     }
-
-  //     const cacheKey = JSON.stringify(images);
-  //     const hasLoaded = !hydrated.current && hasImageLoaded(cacheKey);
-
-  //     const component = (
-  //       <LayoutWrapper layout={layout} width={width} height={height}>
-  //         {!hasLoaded && <Placeholder {...getPlaceHolderProps(placeholder)} />}
-  //         <MainImage
-  //           {...(props as Omit<MainImageProps, 'images' | 'fallback'>)}
-  //           {...getMainProps(
-  //             isLoading,
-  //             hasLoaded || isLoaded,
-  //             images,
-  //             loading,
-  //             () => {
-  //               toggleIsLoaded(true);
-  //             },
-  //             cacheKey,
-  //             ref
-  //           )}
-  //         />
-  //       </LayoutWrapper>
-  //     );
-
-  //     doRender(component, root.current);
-  //     hydrated.current = true;
-
-  //     if (!(`IntersectionObserver` in window)) {
-  //       toggleIsLoading(true);
-  //       return;
-  //     }
-
-  //     io.current = new IntersectionObserver(
-  //       (entries) => {
-  //         entries.forEach((entry) => {
-  //           if (entry.isIntersecting) {
-  //             toggleIsLoading(true);
-  //           }
-  //         });
-  //       },
-  //       {
-  //         // TODO tweak
-  //         rootMargin: '150%',
-  //       }
-  //     );
-  //     io.current.observe(root.current);
-  //   }
-
-  //   return () => {
-  //     if (root.current) {
-  //       if (io.current) {
-  //         io.current.unobserve(root.current);
-  //       }
-
-  //       render(null, root.current);
-  //     }
-  //   };
-  // }, [isLoading, isLoaded]);
+      import('./lazyHydrate').then(({ lazyHydrate }) => {
+        lazyHydrator.current = lazyHydrate(
+          {
+            layout,
+            width,
+            height,
+            images,
+            isLoading,
+            isLoaded,
+            toggleIsLoaded: () => {
+              customOnLoad && (customOnLoad as Function)();
+              toggleIsLoaded(true);
+            },
+            ref,
+            ...props,
+          },
+          root,
+          hydrated
+        );
+      });
+    }
+  }, [
+    width,
+    height,
+    layout,
+    images,
+    isLoading,
+    isLoaded,
+    toggleIsLoaded,
+    ref,
+    props,
+  ]);
 
   return (
     <Type

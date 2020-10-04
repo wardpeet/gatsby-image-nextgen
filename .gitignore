@@ -8,4 +8,6 @@
 
 node_modules/
 dist/
+gatsby-image/gatsby-ssr.js
+gatsby-image/gatsby-node.js
 coverage/

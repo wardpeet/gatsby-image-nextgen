@@ -1,4 +1,4 @@
-import { useState, CSSProperties, useEffect } from 'react';
+import { useState, CSSProperties, useEffect, useRef, RefObject } from 'react';
 const imageCache = new Set<string>();
 
 // Native lazy-loading support: https://addyosmani.com/blog/lazy-loading/
@@ -56,8 +56,29 @@ export function getMainProps(
       opacity: isLoaded ? 1 : 0,
     },
     onLoad: function (e: any) {
-      imageCache.add(cacheKey);
-      toggleLoaded(true);
+      if (isLoaded) {
+        return;
+      }
+
+      storeImageloaded(cacheKey);
+
+      const target = e.target;
+      const img = new Image();
+      img.src = target.currentSrc;
+
+      if (img.decode) {
+        // Decode the image through javascript to support our transition
+        img
+          .decode()
+          .catch((err) => {
+            // ignore error, we just go forward
+          })
+          .then(() => {
+            toggleLoaded(true);
+          });
+      } else {
+        toggleLoaded(true);
+      }
     },
     ref,
   };
@@ -69,25 +90,12 @@ export function getMainProps(
     result.style.position = 'absolute';
     result.style.top = 0;
     result.style.transform = 'translateZ(0)';
-    result.style.transition = 'opacity 300ms';
+    result.style.transition = 'opacity 500ms linear';
     result.style.width = '100%';
     result.style.willChange = 'opacity';
   }
 
-  return {
-    ...images,
-    loading,
-    shouldLoad: isLoading,
-    'data-main-image': '',
-    style: {
-      opacity: isLoaded ? 1 : 0,
-    },
-    onLoad: function (e: any) {
-      imageCache.add(cacheKey);
-      toggleLoaded(true);
-    },
-    ref,
-  };
+  return result;
 }
 
 export function getPlaceHolderProps(placeholder: any) {
@@ -135,7 +143,7 @@ export function useImageLoaded(
     function toggleIfRefExists() {
       if (ref.current) {
         if (loading === 'eager' && ref.current.complete) {
-          imageCache.add(cacheKey);
+          storeImageloaded(cacheKey);
           toggleLoaded(true);
         } else {
           toggleIsLoading(true);
@@ -157,6 +165,13 @@ export function useImageLoaded(
     toggleLoaded,
   };
 }
+
+// return () => {
+//   if (root.current) {
+//     render(null, root.current);
+//   }
+// };
+// }
 
 // export function useGatsbyImage({
 //   placeholder,

@@ -1,5 +1,9 @@
 exports.onCreateWebpackConfig = ({ stage, plugins, actions }) => {
-  if (stage !== 'develop' && stage !== 'build-javascript') {
+  if (
+    stage !== 'develop' &&
+    stage !== 'build-javascript' &&
+    stage !== 'build-html'
+  ) {
     return;
   }
 

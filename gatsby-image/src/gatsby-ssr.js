@@ -27,7 +27,7 @@ export function onRenderBody({ setHeadComponents }, pluginOptions) {
   .gatsby-image [data-main-image] {
     opacity: 0;
     transform: translateZ(0px);
-    transition: opacity 300ms ease 0s;
+    transition: opacity 500ms linear;
     will-change: opacity;
   }
     `)}
@@ -50,17 +50,29 @@ export function onRenderBody({ setHeadComponents }, pluginOptions) {
   const hasNativeLazyLoadSupport = typeof HTMLImageElement !== "undefined" && "loading" in HTMLImageElement.prototype;
   if (hasNativeLazyLoadSupport) {
     document.body.addEventListener('load', function gatsbyImageNativeLoader(e) {
-      //
+      // if image is not tagged with Main Image we bail
       if (typeof e.target.dataset["mainImage"] === 'undefined') {
         return
       }
 
+      // if a main image does not have a ssr tag, we know it's not the first run anymore
       if (typeof e.target.dataset["gatsbyImageSsr"] === 'undefined') {
         document.body.removeEventListener('load', gatsbyImageNativeLoader, true);
         return;
       }
 
-      e.target.style.opacity = 1;
+
+      const target = e.target;
+      const img = new Image();
+      img.src = target.currentSrc;
+      // We decode the img through javascript so we're sure the blur-up effect works
+      img.decode()
+        .catch(() => {
+          // do nothing
+        })
+        .then(() => {
+          target.style.opacity = 1
+        })
     }, true)
   }
     `)}
