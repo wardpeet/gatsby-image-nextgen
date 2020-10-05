@@ -98,6 +98,7 @@ const Layout = ({ children, image, imageTitle, imageBackgroundColor }) => (
         style={{ position: `fixed` }}
         backgroundColor={imageBackgroundColor ? imageBackgroundColor : false}
         title={imageTitle}
+        alt={imageTitle}
         loading="eager"
       />
     )}

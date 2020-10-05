@@ -1,9 +1,9 @@
-import * as React from "react";
-import { GatsbyImage as Img } from "@wardpeet/gatsby-image-nextgen/compat";
-import styled from "@emotion/styled";
+import * as React from 'react';
+import { GatsbyImage as Img } from '@wardpeet/gatsby-image-nextgen/compat';
+import styled from '@emotion/styled';
 
-import { rhythm, options } from "../utils/typography";
-import { mq, gutter } from "../utils/presets";
+import { rhythm, options } from '../utils/typography';
+import { mq, gutter } from '../utils/presets';
 
 const Image = styled(Img)`
   display: block;
@@ -50,6 +50,7 @@ const FloatingImage = ({
       ]}
       backgroundColor={backgroundColor ? backgroundColor : false}
       title={title}
+      alt={title}
     />
   </React.Fragment>
 );

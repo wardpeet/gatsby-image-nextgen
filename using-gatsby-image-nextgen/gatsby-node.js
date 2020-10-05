@@ -1,3 +1,3 @@
-exports.onPreInit = () => {
-  process.env.NODE_ENV = 'development';
-};
+// exports.onPreInit = () => {
+//   process.env.NODE_ENV = 'development';
+// };

@@ -1,10 +1,10 @@
-import * as React from "react";
-import { graphql } from "gatsby";
-import { GatsbyImage as Img } from "@wardpeet/gatsby-image-nextgen/compat";
+import * as React from 'react';
+import { graphql } from 'gatsby';
+import { GatsbyImage as Img } from '@wardpeet/gatsby-image-nextgen/compat';
 
-import FloatingImage from "../components/floating-image";
-import PageTitle from "../components/page-title";
-import Layout from "../components/layout";
+import FloatingImage from '../components/floating-image';
+import PageTitle from '../components/page-title';
+import Layout from '../components/layout';
 
 const BlurUp = ({ data, location }) => (
   <Layout
@@ -43,6 +43,7 @@ const BlurUp = ({ data, location }) => (
     <Img
       fluid={data.fullWidthImage.localFile.childImageSharp.fluid}
       title={`“${data.fullWidthImage.title}” by ${data.fullWidthImage.credit} (via unsplash.com)`}
+      alt={`“${data.fullWidthImage.title}” by ${data.fullWidthImage.credit} (via unsplash.com)`}
     />
   </Layout>
 );

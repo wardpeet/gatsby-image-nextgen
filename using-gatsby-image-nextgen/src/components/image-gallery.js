@@ -1,10 +1,10 @@
-import * as React from "react";
-import { GatsbyImage as Img } from "@wardpeet/gatsby-image-nextgen/compat";
-import styled from "@emotion/styled";
-import numeral from "numeral";
+import * as React from 'react';
+import { GatsbyImage as Img } from '@wardpeet/gatsby-image-nextgen/compat';
+import styled from '@emotion/styled';
+import numeral from 'numeral';
 
-import { mq, gutter, offset, offsetXxl } from "../utils/presets";
-import { options, scale } from "../utils/typography";
+import { mq, gutter, offset, offsetXxl } from '../utils/presets';
+import { options, scale } from '../utils/typography';
 
 const OuterContainer = styled(`div`)`
   background: #fff;
@@ -96,6 +96,7 @@ const ImageGallery = (edges) => (
           <GridItemImage
             fluid={image.node.localFile.childImageSharp.fluid}
             title={`“${image.node.title}” by ${image.node.credit} (via unsplash.com)`}
+            alt={`“${image.node.title}” by ${image.node.credit} (via unsplash.com)`}
           />
           <Badge>
             SVG

@@ -1,9 +1,9 @@
-import * as React from "react";
-import { graphql } from "gatsby";
-import { GatsbyImage as Img } from "@wardpeet/gatsby-image-nextgen/compat";
-import FloatingImage from "../components/floating-image";
-import PageTitle from "../components/page-title";
-import Layout from "../components/layout";
+import * as React from 'react';
+import { graphql } from 'gatsby';
+import { GatsbyImage as Img } from '@wardpeet/gatsby-image-nextgen/compat';
+import FloatingImage from '../components/floating-image';
+import PageTitle from '../components/page-title';
+import Layout from '../components/layout';
 
 const BackgroundColor = ({ data, location }) => (
   <Layout
@@ -17,6 +17,7 @@ const BackgroundColor = ({ data, location }) => (
       imageMobile={data.floatingImageMobile.localFile.childImageSharp.fixed}
       imageDesktop={data.floatingImage.localFile.childImageSharp.fixed}
       title={`“${data.floatingImage.title}” by ${data.floatingImage.credit} (via unsplash.com)`}
+      alt={`“${data.floatingImage.title}” by ${data.floatingImage.credit} (via unsplash.com)`}
       backgroundColor="#DB3225"
     />
     <p>
@@ -36,6 +37,7 @@ const BackgroundColor = ({ data, location }) => (
       fluid={data.fullWidthImage.localFile.childImageSharp.fluid}
       backgroundColor="#F9D6CE"
       title={`“${data.fullWidthImage.title}” by ${data.fullWidthImage.credit} (via unsplash.com)`}
+      alt={`“${data.fullWidthImage.title}” by ${data.fullWidthImage.credit} (via unsplash.com)`}
     />
   </Layout>
 );
